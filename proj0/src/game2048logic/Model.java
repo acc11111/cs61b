@@ -183,6 +183,7 @@ public class Model {
                 //检查是否合并过
                     if(currTile.value()==board.tile(x,targetY+1).value()){
                         targetY += 1;
+                        //...
                     }
                 }
             }
