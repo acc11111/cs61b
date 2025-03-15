@@ -35,6 +35,7 @@ public class TestTask6 {
                 {0, 0, 0, 0}
         };
 
+
         Model after = new Model(result, before.score());
         assertWithMessage("Boards should match:").that(before.toString()).isEqualTo(after.toString());
     }

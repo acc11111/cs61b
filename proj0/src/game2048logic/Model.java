@@ -202,10 +202,18 @@ public class Model {
      * so we are tilting the tiles in this column up.
      * */
     public void tiltColumn(int x) {
+        for(int y = board.size()-1;y >= 0 ;y--){
+            //注意这里需要从移动方向的头那里开始看，不然会导致后面合并，我们想要的是优先头部合并
+            if(board.tile(x,y)!=null){
+                //还是注意检查null
+                moveTileUpAsFarAsPossible(x,y);
+            }
+        }
         // TODO: Task 7. Fill in this function.
     }
 
     public void tilt(Side side) {
+
         // TODO: Tasks 8 and 9. Fill in this function.
     }
 
