@@ -182,6 +182,8 @@ public class Model {
                 if(!currTile.wasMerged()&& (!nextTile.wasMerged())){
                 //检查是否合并过
                     if(currTile.value()==board.tile(x,targetY+1).value()){
+                        //如果没有被合并过
+                        score += currTile.value()*2;
                         targetY += 1;
                         //...
                     }
@@ -214,9 +216,11 @@ public class Model {
     }
 
     public void tilt(Side side) {
+        board.setViewingPerspective(side);
         for(int x = 0;x<board.size();x++){
             tiltColumn(x);
         }
+        board.setViewingPerspective(Side.NORTH);
         // TODO: Tasks 8 and 9. Fill in this function.
     }
 
