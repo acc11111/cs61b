@@ -4,6 +4,7 @@ import game2048rendering.Board;
 import game2048rendering.Side;
 import game2048rendering.Tile;
 
+import javax.swing.*;
 import java.util.Formatter;
 
 
@@ -84,7 +85,15 @@ public class Model {
     /** Returns true if at least one space on the board is empty.
      *  Empty spaces are stored as null.
      * */
+
     public boolean emptySpaceExists() {
+        for(int i = 0;i< board.size();i++){
+            for(int j = 0;j< board.size();j++){
+                if(board.tile(i,j)==null){
+                    return true;
+                }
+            }
+        }
         // TODO: Task 1. Fill in this function.
         return false;
     }
