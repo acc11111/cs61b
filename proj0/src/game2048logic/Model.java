@@ -122,6 +122,32 @@ public class Model {
      * 2. There are two adjacent tiles with the same value.
      */
     public boolean atLeastOneMoveExists() {
+        if(emptySpaceExists()){
+            return true;
+        }else{
+            // 循环遍历每一个元素，查看四周有没有可以合并的元素/相同的值
+            for(int x = 0;x< board.size();x++){
+                for(int y = 0;y< board.size();y++){
+                    // 使用熔断机制避免访问越界的位置，这里需要避免右侧边界的访问下标最多是3，因此不取等
+                    if((0 <= x - 1 && x - 1 < 4)&&(board.tile(x,y).value()==board.tile(x-1,y).value())){
+                        //检查左侧
+                        return true;
+                    }
+                    if((0 <= x + 1 && x + 1 < 4)&&(board.tile(x,y).value()==board.tile(x+1,y).value())){
+                        //检查右侧
+                        return true;
+                    }
+                    if((0 <= y + 1 && y + 1 < 4)&&(board.tile(x,y).value()==board.tile(x,y+1).value())){
+                        //检查上侧
+                        return true;
+                    }
+                    if((0 <= y - 1 && y - 1 < 4)&&(board.tile(x,y).value()==board.tile(x,y-1).value())){
+                        //检查下侧
+                        return true;
+                    }
+                }
+            }
+        }
         // TODO: Task 3. Fill in this function.
         return false;
     }
@@ -144,9 +170,31 @@ public class Model {
         Tile currTile = board.tile(x, y);
         int myValue = currTile.value();
         int targetY = y;
+        // 依然是使用熔断机制限制访问的位置，以后先将下标放在前面判断，可以使用熔断避免访问
+        while(targetY + 1 < 4 && board.tile(x,targetY +1) == null){
+            targetY += 1;
+        }
+        //目前来到了未合并的最前端
+        if(targetY + 1 < 4 ){
+            Tile nextTile = board.tile(x,targetY +1);
+            if(nextTile != null ){
+                //检查是否为空指针，避免空指针错误
+                if(!currTile.wasMerged()&& (!nextTile.wasMerged())){
+                //检查是否合并过
+                    if(currTile.value()==board.tile(x,targetY+1).value()){
+                        targetY += 1;
+                    }
+                }
+            }
+        }
 
-        // TODO: Tasks 5, 6, and 10. Fill in this function.
-    }
+
+        board.move(x,targetY,currTile);
+
+
+
+    // TODO: Tasks 5, 6, and 10. Fill in this function.
+}
 
     /** Handles the movements of the tilt in column x of board B
      * by moving every tile in the column as far up as possible.
