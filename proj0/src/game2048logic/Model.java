@@ -104,6 +104,13 @@ public class Model {
      * given a Tile object t, we get its value with t.value().
      */
     public boolean maxTileExists() {
+        for(int i = 0;i< board.size();i++){
+            for(int j = 0;j< board.size();j++){
+                if(board.tile(i,j) != null && board.tile(i,j).value()==MAX_PIECE){
+                    return true;
+                }
+            }
+        }
         // TODO: Task 2. Fill in this function.
         return false;
     }
