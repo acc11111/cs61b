@@ -9,10 +9,12 @@ public class LinkedListDeque61B<T> implements Deque61B<T> {
 
     //做好Node类，方便后续使用
     private static class Node<T>{
-        T item;
         Node<T> next;
+        T item;
+        Node<T> prev;
 
-        Node(T item,Node<T> next){
+        Node(Node<T> prev,T item,Node<T> next){
+            this.prev = prev;
             this.item = item;
             this.next = next;
         }
@@ -26,14 +28,22 @@ public class LinkedListDeque61B<T> implements Deque61B<T> {
 
     //初始化一个新的链表
     public LinkedListDeque61B(){
-        sentinel = new Node<T>(null,null);
+        sentinel = new Node<T>(null,null,null);
+        sentinel.prev = sentinel;//这里指向自己，后续可以同步
+        sentinel.next = sentinel;//这里也是指向自己
         size = 0;
     }
 
     //初始化一个带数据的新链表
     public LinkedListDeque61B(T x){
-        sentinel = new Node<T>(null,null);
-        sentinel.next = new Node<T>(x,null);
+        sentinel = new Node<T>(null,null,null);
+        Node<T> newNode = new Node<T>(sentinel,x,sentinel.next);
+
+        //更新哨兵节点
+        sentinel.prev = newNode;
+        sentinel.next = newNode;
+
+
         size += 1;
     }
 
@@ -49,10 +59,15 @@ public class LinkedListDeque61B<T> implements Deque61B<T> {
      */
     @Override
     public void addFirst(T x){
-
+        //创建新节点
+        Node<T> newNode = new Node<T>(sentinel,x,sentinel.next);
         //插入值，然后将哨兵节点指向新插入的值
-        sentinel.next = new Node<>(x,sentinel.next);
-        //记得更新大小
+
+        //原来哨兵节点的下一个节点的前一个指向新节点，即使链表是空的依旧成立
+        newNode.next.prev = newNode;
+        //哨兵节点的next节点更新为新的节点
+        sentinel.next = newNode;
+
         size += 1;
 
     }
@@ -64,13 +79,20 @@ public class LinkedListDeque61B<T> implements Deque61B<T> {
      */
     @Override
     public void addLast(T x){
-        Node<T> p = sentinel;
-        //注意这里是检查p.next，而不是检查p，否则会出现null的指针
-        while(p.next != null){
-            p = p.next;
-        }
-        p.next = new Node<T>(x,null);
+
+        //创建一个新节点，这个新节点指向原来最后的元素，然后next指向哨兵节点
+        Node<T> newNode = new Node<T>(sentinel.prev,x,sentinel);
+
+        //更新原来的next节点
+        newNode.prev.next = newNode;
+
+        //更新哨兵节点
+        sentinel.prev  = newNode;
+
         size += 1;
+
+
+
 
     }
 
@@ -84,7 +106,8 @@ public class LinkedListDeque61B<T> implements Deque61B<T> {
         //记得更新大小
         List<T> returnList = new LinkedList<>();
         Node<T> p = sentinel;
-        while(p.next != null){
+        while(p.next != sentinel){
+            //更新这个p.next的判断，如果指回了哨兵节点说明这个就是最后一个节点了，不需要再继续了
             p = p.next;
             returnList.add(p.item);
 
@@ -123,13 +146,12 @@ public class LinkedListDeque61B<T> implements Deque61B<T> {
      */
     @Override
     public T removeFirst(){
-        //这里需要检测一下是否存在第一项
-        Node<T> first = sentinel.next;
+        Node<T> firstNode = sentinel.next;
+        sentinel.next = firstNode.next;//指向第二个元素
+        firstNode.next.prev = sentinel;
+        size --;
 
-        sentinel.next = first.next;
-        size -= 1;
-        return first.item;
-
+        return firstNode.item;
     }
 
     /**
@@ -139,19 +161,14 @@ public class LinkedListDeque61B<T> implements Deque61B<T> {
      */
     @Override
     public T removeLast(){
-        Node<T> p = sentinel;
+        Node<T> lastNode = sentinel.prev;
 
-        //找到倒数第二个节点
-        while(p.next.next != null){
-            p = p.next;
-        }
+        //更新节点之间的关系
+        lastNode.prev.next = sentinel;
+        sentinel.prev = lastNode.prev;
 
-        //定义新变量，否则会导致后面空指针错误
-        T lastItem = p.next.item;
-        p.next = null;
         size -= 1;
-        return lastItem;
-
+        return lastNode.item;
 
     }
 
@@ -166,7 +183,7 @@ public class LinkedListDeque61B<T> implements Deque61B<T> {
      */
     @Override
     public T get(int index){
-        if(index > size - 1){
+        if(index > size - 1 || index < 0){
             return null;
         }else {
             Node<T> p = sentinel;
@@ -208,7 +225,11 @@ public class LinkedListDeque61B<T> implements Deque61B<T> {
     public static void main(String[] args) {
         LinkedListDeque61B<Integer> test = new LinkedListDeque61B<>();
         test.addFirst(1);
-        System.out.println(test.get(0));
+        test.addFirst(2);
+        test.addFirst(3);
+        test.addFirst(4);
+        test.addFirst(5);
+        System.out.println(test.get(5));
         System.out.println(test.toList());
 
 
