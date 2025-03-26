@@ -8,22 +8,25 @@ public class ArrayDeque61B<T> implements Deque61B<T>{
     private T[] arr ;
     private int size = 0;
     private int front = 0;
-    private int last = 0;
-    //last 指向的是尾部元素的下一位
+    private int rear = 0;
+    private int capatity = 1000;
+    //rear 指向的是尾部元素的下一位
     //front 指向的是头部元素的当前头
+    //判断的就是(rear + 1) % capatity == front?如果相等的话就是满了，这样虽然会浪费一个存储空间，但是可以区分空队列和满队列
+
 
 
     public ArrayDeque61B(){
         //空输入的构造函数
-        arr = (T[]) new Object[1000];
+        arr = (T[]) new Object[capatity];
         size = 0;
     }
 
     public ArrayDeque61B(T x){
         //空输入的构造函数
-        arr = (T[]) new Object[1000];
+        arr = (T[]) new Object[capatity];
         arr[front] = x;
-        last ++;
+        rear ++;
         size += 1;
     }
 
@@ -31,11 +34,11 @@ public class ArrayDeque61B<T> implements Deque61B<T>{
     @Override
     public void addFirst(T x) {
         //传入的数字是添加的元素
-        if(Math.floorMod(last + 1,1000) == front){
+        if(size == capatity){
             //此时数组超出范围了
             System.out.println("can not addFirst");
         }else{
-            front = Math.floorMod(front - 1,1000);//更新front指针
+            front = Math.floorMod(front - 1,capatity);//更新front指针
             arr[front] = x;
             size ++;
         }
@@ -44,13 +47,13 @@ public class ArrayDeque61B<T> implements Deque61B<T>{
     @Override
     public void addLast(T x) {
         //传入的数字是添加的元素
-        if(Math.floorMod(last + 1,1000) == front){
+        if(size == capatity){
             //此时数组超出范围了
-            System.out.println("can not addLast");
+            System.out.println("can not addrear");
         }else{
-            arr[last] = x;
+            arr[rear] = x;
             size ++;
-            last = Math.floorMod(last + 1,1000);//更新front指针
+            rear = Math.floorMod(rear + 1,capatity);//更新front指针
         }
     }
 
@@ -58,9 +61,9 @@ public class ArrayDeque61B<T> implements Deque61B<T>{
     public List<T> toList() {
         List<T> resList = new ArrayList<>();
         int i = front;
-        while(i != last){
+        while(i != rear){
             resList.add(arr[i]);
-            i = Math.floorMod(i + 1,1000);
+            i = Math.floorMod(i + 1,capatity);
         }
 
         return resList;
@@ -79,22 +82,22 @@ public class ArrayDeque61B<T> implements Deque61B<T>{
     @Override
     public T removeFirst() {
         T removeElement = arr[front];
-        front = Math.floorMod(front + 1,1000);
+        front = Math.floorMod(front + 1,capatity);
         size --;
         return removeElement;
     }
 
     @Override
     public T removeLast() {
-        T removeElement = arr[last - 1];
-        last = Math.floorMod(last - 1,1000);
+        T removeElement = arr[rear - 1];
+        rear = Math.floorMod(rear - 1,capatity);
         size --;
         return removeElement;
     }
 
     @Override
     public T get(int index) {
-        int i = Math.floorMod(front + index,1000);
+        int i = Math.floorMod(front + index,capatity);
         return arr[i];
     }
 
@@ -109,14 +112,44 @@ public class ArrayDeque61B<T> implements Deque61B<T>{
         if(index == 0){
             return arr[i];
         }else{
-            i = Math.floorMod(i + 1,1000);
+            i = Math.floorMod(i + 1,capatity);
             return getRecursiveHelper(index - 1,i);
         }
     }
 
     @Override
     public Iterator<T> iterator() {
-        return null;
+        return new ArrayDeque61BIterator();
     }
+
+
+    // 实现自己的数组列表迭代器
+    private class ArrayDeque61BIterator<T> implements  Iterator<T>{
+
+        private int p; //初始化一个索引，后面用来和size作为比较来使用
+
+        public ArrayDeque61BIterator(){
+            p = 0;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return p < size;
+        }
+
+        @Override
+        public T next() {
+            if(hasNext()){
+                // 此时说明还没有指向空元素
+                p = p + 1;
+                int i = (front + p - 1 )% capatity; //防止越界
+                return (T) arr[i];
+            }else{
+                // 此时说明已经指向空元素
+                return null;
+            }
+        }
+    }
+
 }
 
