@@ -10,9 +10,34 @@ import java.util.List;
 
 public class LinkedListDeque61B<T> implements Deque61B<T> {
 
+    // 完成这个迭代器的添加
     @Override
     public Iterator<T> iterator() {
-        return null;
+        return new LinkedListDeque61BIterator();
+    }
+
+
+    private class LinkedListDeque61BIterator<T> implements Iterator<T>{
+        private Node<T> p;
+
+        public LinkedListDeque61BIterator(){
+            p = (Node<T>) sentinel.next; //强制转换
+        }
+
+        @Override
+        public boolean hasNext() {
+            // 一定要记得只有当前指针指向不是元素的时候才是没有下一个
+            return p != sentinel;
+        }
+
+        @Override
+        public T next() {
+            if(hasNext()){
+                p = p.next;
+                return p.prev.item;
+            }
+            return null;
+        }
     }
 
     //做好Node类，方便后续使用
@@ -229,6 +254,58 @@ public class LinkedListDeque61B<T> implements Deque61B<T> {
         }
     }
 
+    //检测通过了
+    @Override
+    public boolean equals(Object x) {
+        // 检查是否是同一个对象
+        if (this == x) {
+            return true;
+        }
+
+        // 检查是否同类或者存在
+        if (!(x instanceof LinkedListDeque61B)) {
+            //不同类就返回false
+            return false;
+        }
+
+        //检查size
+        if (this.size != ((LinkedListDeque61B<?>) x).size) {
+            return false;
+        }
+
+        //开始逐步检查元素
+        Node<T> p = this.sentinel.next;
+        Node<T> q = (Node<T>) ((LinkedListDeque61B<?>) x).sentinel.next;
+        for(int i = 0;i<size;i++){
+            //0--->size-1因此需要从第一个元素开始
+            if(p.item != q.item){
+                return false;
+            }
+            p = p.next;
+            q = q.next;
+        }
+
+        //经过一系列的排查都没有返回false就是相同了
+        return true;
+
+
+
+    }
+
+    @Override
+    public String toString(){
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        Node<T> p = this.sentinel.next;
+        for(int i = 0; i < size; i++){
+            sb.append(p.item);
+            p = p.next;
+        }
+        sb.append("]");
+
+        return sb.toString();
+    }
+
 
     public static void main(String[] args) {
         LinkedListDeque61B<Integer> test = new LinkedListDeque61B<>();
@@ -239,8 +316,7 @@ public class LinkedListDeque61B<T> implements Deque61B<T> {
         test.addFirst(5);
         System.out.println(test.get(5));
         System.out.println(test.toList());
-
+        System.out.println(test.toString());
 
     }
 }
-
