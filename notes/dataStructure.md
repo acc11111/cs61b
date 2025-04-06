@@ -189,3 +189,81 @@ public class Main {
 
 `快速联合+路径压缩`
 
+个人感觉这个实现不是很难，难的是理解为什么要这样设计。这也是`cs61b`一个比较好的地方，从一个没有涉及过类似算法的人的思考开始结合生活中的一些现象慢慢步入这个算法的提出与实现
+
+```java
+    public void union(int v1, int v2) {
+        // TODO: YOUR CODE HERE
+        //检查相同情况
+        if(v1 == v2){
+            return;
+        }
+
+        int parent1 = v1;
+        int parent2 = v2;
+
+        //找出根节点
+        while(arr[parent1] > 0){
+            parent1 = parent(parent1);
+        }
+        while(arr[parent2] > 0){
+            parent2 = parent(parent2);
+        }
+
+        //此时的parent都是指向根节点的元素，而不是值
+        //将2节点的根节点指向1的根节点
+        if(sizeOf(parent2) >= sizeOf(parent1) ){
+            arr[parent1] = parent2;
+            arr[parent2] = -(sizeOf(parent2) + sizeOf(parent1));
+        }else{
+            arr[parent2] = parent1;
+            arr[parent1] = -(sizeOf(parent2) + sizeOf(parent1));
+        }
+
+
+    }
+```
+
+
+
+#### 快速联合
+
+使用`size`来比较，将小树挂在大树上面，使得树比较繁茂的同时不会由于使用height的时间太久。并且在`root`节点使用`size`的负数来存储，又可以表示`root`节点，又可以表示当前树的大小！
+
+#### 路径压缩
+
+在每一次的查找的时候，都是从`findNode-->rootNode`，因此会将这些节点都遍历一遍，这是不可避免的，但是既然都遍历了，那么只需要做多一步将遍历的节点全部挂载到`root`节点的话就可以使得下次寻找的路径被压缩！
+
+```java
+    /* Returns the root of the set V belongs to. Path-compression is employed
+       allowing for fast search-time. If invalid items are passed into this
+       function, throw an IllegalArgumentException. */
+    public int find(int v) {
+        // TODO: YOUR CODE HERE
+        //先使用非路径压缩的版本
+        if(v >= size){
+            throw new IllegalArgumentException();
+        }
+        int root = v;
+        if(root < 0){
+            return root;
+        }
+            while(parent(root) >= 0){
+                root = parent(root);
+            }
+        // PATH-COMPRESSION使用路径压缩
+        // System.out.println("this is the value to find:"+v);
+        int current = v;
+        int p_current = parent(current);
+        while(p_current >= 0){
+            arr[current] = root;
+            current = p_current;
+            p_current = parent(current);//Upadte the current and parent of current
+
+        }
+		//循环出来的时候current指向root节点，p_current指向root节点里面的内容
+        return root;
+	
+    }
+```
+
